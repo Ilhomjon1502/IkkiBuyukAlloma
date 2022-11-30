@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Икки буюк Аллома</string>
+    <string name="tab_text_1">Устоз Муҳаммаджон Домла Ҳиндистоний раҳимаҳуллоҳ</string>
+    <string name="tab_text_2">Устоз Абдуллажон маҳдум дада раҳимаҳуллоҳ</string>
+    <string name="download_channel_name">Ikki buyuk Alloma dasturini yuklab olish</string>
+    <string name="rule">Rule</string>
+    <string name="text_telegram_chanel">Телеграм канал</string>
+    <string name="text_share">Улашиш</string>
+    <string name="text_about">Биз ҳақимизда</string>
+    <string name="text_other_apps">Бизнинг дастурларимиз</string>
+    <string name="root_id">AUDIO_SERVICE_ROOT_ID</string>
+    <string name="about_us">Биз ҳақимизда</string>
+    <string name="about_us_text">Фарғона вилояти, Марғилон шаҳар «Зайд ибн Ҳориса» жомеъ масжиди собиқ имом-хатиби Устоз Саййид Абдулбоситхон Сафохон ўғли</string>
+    <string name="copyright">Sayyid Safo | Барча ҳуқуқлар ҳимояланган</string>
+    <string name="app_url">https://play.google.com/store/apps/details?id=uz.mnsh.buyuklar</string>
+    <string name="telegram_url">https://t.me/sayyidsafo</string>
+    <string name="our_app">http://play.google.com/store/apps/developer?id=Muhammadamin+MNSH</string>
+
+</resources>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/driving_mode_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:clickable="true"
+    android:visibility="gone"
+    android:focusable="true">
+
+    <TextView
+        android:id="@+id/audio_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/raleway_semibold"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:text="@string/app_name"
+        android:textColor="#212121"
+        android:textSize="24sp"
+        android:layout_marginTop="50dp"/>
+
+    <ImageView
+        android:id="@+id/play_button"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:tint="@color/colorPrimary"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_play_circled"
+        android:layout_centerInParent="true"/>
+
+    <ImageView
+        android:id="@+id/replay"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:tint="@color/colorPrimary"
+        android:src="@drawable/replay_30"
+        android:layout_below="@id/play_button"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="30dp"/>
+
+    <ImageView
+        android:id="@+id/forward"
+        android:tint="@color/colorPrimary"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/forward_30"
+        android:layout_below="@id/play_button"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="50dp"/>
+
+</RelativeLayout>

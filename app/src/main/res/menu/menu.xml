@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/btn_question"
+        android:icon="@drawable/ic_question"
+        android:title="@string/rule"
+        app:showAsAction="ifRoom|withText" />
+
+    <item
+        android:id="@+id/btn_rule"
+        android:icon="@drawable/ic_rul"
+        android:title="@string/rule"
+        app:showAsAction="ifRoom|withText" />
+
+    <item
+        android:id="@+id/tv_telegram"
+        android:title="@string/text_telegram_chanel" />
+
+    <item
+        android:id="@+id/tv_share"
+        android:title="@string/text_share" />
+
+    <item
+        android:id="@+id/tv_about"
+        android:title="@string/text_about" />
+
+    <item
+        android:id="@+id/tv_other_app"
+        android:title="@string/text_other_apps" />
+</menu>
