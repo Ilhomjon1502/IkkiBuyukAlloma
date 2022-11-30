@@ -9,6 +9,7 @@ import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.PowerManager
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import uz.mnsh.buyuklar.data.model.SongModel
@@ -313,7 +314,16 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
             index = if (isNext) currentIndex + 1 else currentIndex - 1
             mSelectedSong = mSongs!![index]
         } catch (e: IndexOutOfBoundsException) {
-            mSelectedSong = if (currentIndex != 0) mSongs!![0] else mSongs!![mSongs!!.size - 1]
+            try {
+                mSelectedSong =
+                    if (currentIndex != 0)
+                        mSongs!![0]
+                    else
+                        mSongs!![mSongs!!.size - 1]
+
+            }catch (e:Exception){
+                Toast.makeText(mContext, "Xatolik \n ${e.message}", Toast.LENGTH_SHORT).show()
+            }
             e.printStackTrace()
         }
         initMediaPlayer()
