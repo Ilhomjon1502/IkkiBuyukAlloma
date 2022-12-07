@@ -18,11 +18,13 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import com.google.android.material.tabs.TabLayout
 import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
+import com.github.florent37.runtimepermission.kotlin.askPermission
 import com.google.android.exoplayer2.ui.BuildConfig
 import com.google.gson.Gson
 import com.mnsh.sayyidsafo.R
@@ -132,17 +134,47 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun requestPermissions() {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ),
-            1
-        )
-        App.DIR_PATH =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
-        App.DIR_PATH += "/Ikki buyuk alloma/"
+//        ActivityCompat.requestPermissions(
+//            this,
+//            arrayOf(
+//                Manifest.permission.READ_EXTERNAL_STORAGE,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE
+//            ),
+//            1
+//        )
+//        App.DIR_PATH =
+//            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
+//        App.DIR_PATH += "/Ikki buyuk alloma/"
+
+
+        askPermission(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE){
+            //all permissions already granted or just granted
+            App.DIR_PATH =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
+            App.DIR_PATH += "/Ikki buyuk alloma/"
+        }.onDeclined { e ->
+            if (e.hasDenied()) {
+
+                AlertDialog.Builder(this)
+                    .setMessage("Iltimos ilova to'g'ri ishlashi uchun barcha so'rovlarga ruxsat berin..." +
+                            "\nAks holda ilova to'g'ri ishlamaydi")
+                    .setPositiveButton("Xo'p") { dialog, which ->
+                        e.askAgain();
+                    } //ask again
+                    .setNegativeButton("Yo'q") { dialog, which ->
+                        dialog.dismiss();
+                        finish()
+                    }
+                    .show();
+            }
+
+            if(e.hasForeverDenied()) {
+                //the list of forever denied permissions, user has check 'never ask again'
+
+                // you need to open setting manually if you really need it
+                e.goToSettings();
+            }
+        }
     }
 
     private fun bindUI() {
