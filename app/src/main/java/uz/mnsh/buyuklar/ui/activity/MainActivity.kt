@@ -18,6 +18,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.tabs.TabLayout
 import androidx.viewpager.widget.ViewPager
@@ -124,8 +125,12 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         forwardButton = findViewById(R.id.forward)
 
         requestPermissions()
-        bindUI()
-        initializeSeekBar()
+        try {
+            bindUI()
+            initializeSeekBar()
+        }catch (e:Exception){
+            Toast.makeText(this, "File topilmadi \n ${e.message}", Toast.LENGTH_SHORT).show()
+        }
         GlobalScope.launch(Dispatchers.IO) {
             if (unitProvider.isOnline()) {
                 audiosRepository.fetchingAudios()
@@ -389,8 +394,8 @@ class MainActivity : AppCompatActivity(), KodeinAware {
                 intent.type = "text/plain"
                 intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name))
                 var message = getString(R.string.about_us_text)
-                message =
-                    message + "\n" + getString(R.string.app_url) + BuildConfig.APPLICATION_ID + "\n\n"
+//                message = message + "\n" + getString(R.string.app_url) + BuildConfig.APPLICATION_ID + "\n\n"
+                message = message + "\n" + getString(R.string.app_url)  + "\n\n"
                 intent.putExtra(Intent.EXTRA_TEXT, message)
                 startActivity(Intent.createChooser(intent, "Улашиш"))
             }
