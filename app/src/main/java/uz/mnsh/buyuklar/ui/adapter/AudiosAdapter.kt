@@ -17,6 +17,7 @@ import com.downloader.PRDownloader
 import com.downloader.Status
 import com.mnsh.sayyidsafo.R
 import uz.mnsh.buyuklar.App
+import uz.mnsh.buyuklar.App.Companion.BASE_URL
 import uz.mnsh.buyuklar.data.db.model.AudioModel
 import uz.mnsh.buyuklar.data.model.SongModel
 import uz.mnsh.buyuklar.utils.FragmentAction
@@ -60,7 +61,7 @@ class AudiosAdapter(
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: AudiosViewHolder, position: Int) {
         holder.tvTitle.text = listModel[position].name
-        holder.tvSize.text = String.format("%.2f", listModel[position].size.toInt() / 1024.0) + "Мб"
+        holder.tvSize.text =  "${listModel[position].size} Мб"
         holder.tvDuration.text = listModel[position].duration
 
         holder.download.setImageResource(R.drawable.download)
@@ -114,7 +115,7 @@ class AudiosAdapter(
             holder.progressBar.visibility = View.VISIBLE
             holder.download.setImageResource(R.drawable.cancel)
             idList[index] = PRDownloader.download(
-                "http://185.217.131.20" + listModel[index].location,
+                BASE_URL + listModel[index].location,
                 App.DIR_PATH + listModel[index].topic + "/",
                 listModel[index].getFileName()
             ).build()

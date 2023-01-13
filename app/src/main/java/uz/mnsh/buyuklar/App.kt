@@ -36,7 +36,8 @@ class App: Application(), KodeinAware {
 
     companion object {
         var isDownload: Boolean = false
-        const val BASE_URL = "http://185.217.131.20/"
+//        const val BASE_URL = "http://185.217.131.20/"
+        const val BASE_URL = "https://kutubxonam.pythonanywhere.com/"
         var DIR_PATH = ""
     }
 

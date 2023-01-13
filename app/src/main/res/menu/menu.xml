@@ -7,6 +7,7 @@
         android:id="@+id/btn_question"
         android:icon="@drawable/ic_question"
         android:title="@string/rule"
+        android:visible="false"
         app:showAsAction="ifRoom|withText" />
 
     <item
