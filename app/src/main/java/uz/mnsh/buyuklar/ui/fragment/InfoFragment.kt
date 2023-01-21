@@ -25,6 +25,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 import uz.mnsh.buyuklar.App
+import uz.mnsh.buyuklar.App.Companion.BASE_URL
 import uz.mnsh.buyuklar.data.db.model.AudioModel
 import java.io.File
 import java.io.IOException
@@ -160,7 +161,7 @@ class InfoFragment : Fragment(R.layout.info_fragment), CoroutineScope, KodeinAwa
                     progressBar.visibility = View.VISIBLE
                     btnPlay.setImageResource(R.drawable.cancel)
                     downloadID = PRDownloader.download(
-                        "http://5.182.26.44:8080/storage/" + model.location,
+                        BASE_URL + model.location,
                         App.DIR_PATH + model.rn + "/",
                         model.getFileName()
                     ).build()

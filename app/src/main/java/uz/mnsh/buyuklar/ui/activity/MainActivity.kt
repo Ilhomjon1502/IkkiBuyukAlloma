@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             if (mPlayerAdapter != null && mPlayerAdapter?.getCurrentSong()?.name == songModel?.name) {
                 restorePlayerStatus()
             } else {
-                if (songModel != null){
+                if (songModel != null) {
                     onSongSelected(songModel!!)
                 }
             }
@@ -128,7 +128,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         try {
             bindUI()
             initializeSeekBar()
-        }catch (e:Exception){
+        } catch (e: Exception) {
             Toast.makeText(this, "File topilmadi \n ${e.message}", Toast.LENGTH_SHORT).show()
         }
         GlobalScope.launch(Dispatchers.IO) {
@@ -152,7 +152,10 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 //        App.DIR_PATH += "/Ikki buyuk alloma/"
 
 
-        askPermission(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE){
+        askPermission(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) {
             //all permissions already granted or just granted
             App.DIR_PATH =
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
@@ -161,8 +164,10 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             if (e.hasDenied()) {
 
                 AlertDialog.Builder(this)
-                    .setMessage("Iltimos ilova to'g'ri ishlashi uchun barcha so'rovlarga ruxsat berin..." +
-                            "\nAks holda ilova to'g'ri ishlamaydi")
+                    .setMessage(
+                        "Iltimos ilova to'g'ri ishlashi uchun barcha so'rovlarga ruxsat berin..." +
+                                "\nAks holda ilova to'g'ri ishlamaydi"
+                    )
                     .setPositiveButton("Xo'p") { dialog, which ->
                         e.askAgain();
                     } //ask again
@@ -173,7 +178,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
                     .show();
             }
 
-            if(e.hasForeverDenied()) {
+            if (e.hasForeverDenied()) {
                 //the list of forever denied permissions, user has check 'never ask again'
 
                 // you need to open setting manually if you really need it
@@ -197,7 +202,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
                 }
             }
             tvSongName.text = songModel!!.name
-            tvEndTime.text = getFormattedTime(Utils.getDuration(songModel!!.songPath)/1000)
+            tvEndTime.text = getFormattedTime(Utils.getDuration(songModel!!.songPath) / 1000)
         }
 
         imgNext.setOnClickListener {
@@ -207,11 +212,11 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         }
 
         imgPlay.setOnClickListener {
-            if (isSavedSong && songModel != null){
+            if (isSavedSong && songModel != null) {
                 mPlayerAdapter!!.initMediaPlayer()
                 isSavedSong = false
             }
-            if (mPlayerAdapter?.isMediaPlayer() != null){
+            if (mPlayerAdapter?.isMediaPlayer() != null) {
                 resumeOrPause()
             }
         }
@@ -224,10 +229,18 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
 
         forwardButton.setOnClickListener {
-            if (mPlayerAdapter!!.getMediaPlayer()!!.currentPosition.plus(30000) < mPlayerAdapter!!.getMediaPlayer()!!.duration) {
-                mPlayerAdapter!!.seekTo(mPlayerAdapter!!.getMediaPlayer()!!.currentPosition.plus(30000))
+            if (mPlayerAdapter != null) {
+                if (mPlayerAdapter!!.getMediaPlayer()!!.currentPosition.plus(30000) < mPlayerAdapter!!.getMediaPlayer()!!.duration) {
+                    mPlayerAdapter!!.seekTo(
+                        mPlayerAdapter!!.getMediaPlayer()!!.currentPosition.plus(
+                            30000
+                        )
+                    )
+                } else {
+                    mPlayerAdapter!!.skip(true)
+                }
             }else{
-                mPlayerAdapter!!.skip(true)
+                Toast.makeText(this, "243 mPlayerAdapter null", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -244,11 +257,11 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         }
 
         playButton.setOnClickListener {
-            if (isSavedSong && songModel != null){
+            if (isSavedSong && songModel != null) {
                 mPlayerAdapter!!.initMediaPlayer()
                 isSavedSong = false
             }
-            if (mPlayerAdapter?.isMediaPlayer() != null){
+            if (mPlayerAdapter?.isMediaPlayer() != null) {
                 resumeOrPause()
             }
         }
@@ -320,7 +333,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
         tvSongName.text = selectedSong?.name
         audio_title.text = selectedSong?.name
-        tvEndTime.text = getFormattedTime(Utils.getDuration(selectedSong!!.songPath)/1000)
+        tvEndTime.text = getFormattedTime(Utils.getDuration(selectedSong!!.songPath) / 1000)
         seekBar?.max = Utils.getDuration(selectedSong.songPath).toInt()
 
         if (restore) {
@@ -348,9 +361,9 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             R.drawable.ic_play
         imgPlay!!.post { imgPlay!!.setImageResource(drawable) }
 
-        if (mPlayerAdapter!!.getState() != PlaybackInfoListener.State.PAUSED){
+        if (mPlayerAdapter!!.getState() != PlaybackInfoListener.State.PAUSED) {
             playButton.setImageResource(R.drawable.ic_pause_circled)
-        }else{
+        } else {
             playButton.setImageResource(R.drawable.ic_play_circled)
         }
 
@@ -395,7 +408,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
                 intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name))
                 var message = getString(R.string.about_us_text)
 //                message = message + "\n" + getString(R.string.app_url) + BuildConfig.APPLICATION_ID + "\n\n"
-                message = message + "\n" + getString(R.string.app_url)  + "\n\n"
+                message = message + "\n" + getString(R.string.app_url) + "\n\n"
                 intent.putExtra(Intent.EXTRA_TEXT, message)
                 startActivity(Intent.createChooser(intent, "Улашиш"))
             }
@@ -414,7 +427,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
                 startActivity(intent)
             }
             R.id.btn_question -> {
-                if (mPlayerAdapter!!.isPlaying()){
+                if (mPlayerAdapter!!.isPlaying()) {
                     resumeOrPause()
                 }
                 startActivity(Intent(this@MainActivity, InfoActivity::class.java))
@@ -431,8 +444,12 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     override fun onPause() {
         super.onPause()
         doUnbindService()
-        if (mPlayerAdapter != null && mPlayerAdapter!!.isMediaPlayer()) {
-            mPlayerAdapter!!.onPauseActivity()
+        if (mPlayerAdapter != null) {
+            if (mPlayerAdapter!!.isMediaPlayer()) {
+                mPlayerAdapter!!.onPauseActivity()
+            }
+        }else{
+            Toast.makeText(this, "450-qator mPlayerAdapter null", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -460,7 +477,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             ) {
                 isSongPlay.postValue(true)
                 updatePlayingInfo(restore = false, startPlay = true)
-            }else isSongPlay.postValue(false)
+            } else isSongPlay.postValue(false)
         }
     }
 
