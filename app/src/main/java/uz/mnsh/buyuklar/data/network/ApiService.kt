@@ -12,6 +12,8 @@ import retrofit2.http.Query
 import uz.mnsh.buyuklar.App
 import uz.mnsh.buyuklar.data.network.response.AudiosResponse
 
+//audiolarni ma'lumotlarini API dan olib kelib berish
+//API = BASE_URL/audios/1
 interface ApiService {
     @GET("audios")
     suspend fun getAudios(

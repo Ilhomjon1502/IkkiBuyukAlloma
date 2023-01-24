@@ -69,6 +69,7 @@
         layout="@layout/player_layout"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
+<!--    mashina rejimi-->
     <include layout="@layout/auto_mode"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import java.io.IOException
 import java.net.InetAddress
 
+//online yoki yo'qligini va eshitayotgan audiosini keshga yozish
 class UnitProviderImpl(private val context: Context) : PreferenceProvider(context), UnitProvider {
 
     private val audioSaved = "AUDIO_SAVED"

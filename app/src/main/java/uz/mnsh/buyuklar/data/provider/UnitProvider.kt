@@ -1,5 +1,6 @@
 package uz.mnsh.buyuklar.data.provider
 
+//vaqti va audioni keshga yozish rejalashtirish
 interface UnitProvider {
     suspend fun isOnline(): Boolean
 

@@ -19,7 +19,7 @@ import uz.mnsh.buyuklar.data.model.SongModel
 import uz.mnsh.buyuklar.ui.activity.MainActivity
 import uz.mnsh.buyuklar.utils.Utils
 
-
+//notification boshqaruvi
 class MusicNotificationManager internal constructor(private val mMusicService: MusicService) {
     private val CHANNEL_ID = "action.CHANNEL_ID"
     private val REQUEST_CODE = 100

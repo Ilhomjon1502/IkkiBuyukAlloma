@@ -6,6 +6,8 @@ import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+
+//AudioModel table - dasturda asosiy ma'lumotlar
 @Keep
 @Entity(tableName = "audios_table")
 data class AudioModel(

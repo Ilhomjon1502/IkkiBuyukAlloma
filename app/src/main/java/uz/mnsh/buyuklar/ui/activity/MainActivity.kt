@@ -111,14 +111,13 @@ class MainActivity : AppCompatActivity(), KodeinAware {
                 this,
                 supportFragmentManager
             )
-//debug uchun
-//        val mediaPlayer = MediaPlayer.create(this, Uri.parse("/storage/emulated/0/Download/Ikki buyuk alloma/10/O'zbekistonga xush kelibsiz. 2-qism.mp3"))
-//        mediaPlayer.start()
 
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
+
+        //mashina rejimi
         audioTitle = findViewById(R.id.audio_title)
         playButton = findViewById(R.id.play_button)
         replayButton = findViewById(R.id.replay)
@@ -240,7 +239,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
                     mPlayerAdapter!!.skip(true)
                 }
             }else{
-                Toast.makeText(this, "243 mPlayerAdapter null", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "242 mPlayerAdapter null", Toast.LENGTH_SHORT).show()
             }
         }
 

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.mnsh.sayyidsafo.R
 
+//biz haqimizda dialog chiqarib berish
 class AboutUsDialog : DialogFragment() {
 
     override fun onCreateView(

@@ -11,6 +11,7 @@ import java.io.InputStream
 
 object Utils {
 
+    //notification uchun dizayn chizib berish
     fun songArt(path: String, context: Context): Bitmap {
         val retriever = MediaMetadataRetriever()
         val inputStream: InputStream
@@ -25,12 +26,14 @@ object Utils {
         }
     }
 
+//    media davomiyligini qaytarish
     fun getDuration(path: String): Long {
         val retriever = MediaMetadataRetriever()
         retriever.setDataSource(path)
         return retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)!!.toLong()
     }
 
+    //katta icon qaytarish
     private fun getLargeIcon(context: Context): Bitmap {
         return BitmapFactory.decodeResource(context.resources, R.drawable.profile)
     }

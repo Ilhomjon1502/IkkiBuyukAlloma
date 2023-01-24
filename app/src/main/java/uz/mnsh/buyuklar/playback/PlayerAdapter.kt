@@ -6,6 +6,7 @@ import uz.mnsh.buyuklar.data.model.SongModel
 
 import uz.mnsh.buyuklar.playback.PlaybackInfoListener.*
 
+//mediaPlayer uchun funksiyalar rejasi
 interface PlayerAdapter {
 
     fun isMediaPlayer(): Boolean

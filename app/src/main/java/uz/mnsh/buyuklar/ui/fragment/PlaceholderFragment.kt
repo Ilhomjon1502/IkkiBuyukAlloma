@@ -26,6 +26,7 @@ import uz.mnsh.buyuklar.utils.FragmentAction
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 
+//recycleViewni o'z ichiga olgan audiolar ro'yhatini ko'rsatadigan viewPager itemi fragmentidir
 class PlaceholderFragment : Fragment(R.layout.fragment_main), CoroutineScope, KodeinAware, FragmentAction {
 
     override val kodein by closestKodein()
@@ -81,7 +82,7 @@ class PlaceholderFragment : Fragment(R.layout.fragment_main), CoroutineScope, Ko
                     val sm = SongModel(
                         name = file.name.substring(0, file.name.length - 4),
                         songPath = file.path,
-                        topicID = audioModel[0].rn
+                        topicID = audioModel[0].topic
                     )
                     listAudioFile.add(sm)
                 }

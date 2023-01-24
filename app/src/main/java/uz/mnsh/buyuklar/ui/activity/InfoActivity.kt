@@ -7,6 +7,7 @@ import com.google.android.material.tabs.TabLayout
 import com.mnsh.sayyidsafo.R
 import uz.mnsh.buyuklar.ui.adapter.InfoPagerAdapter
 
+//ulamolar haqida ma'lumot berish
 class InfoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

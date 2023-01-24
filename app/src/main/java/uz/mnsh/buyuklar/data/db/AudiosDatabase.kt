@@ -6,9 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import uz.mnsh.buyuklar.data.db.model.AudioModel
 
+
+//AudioModel tableni yaratib berish
 @Database(
     entities = [AudioModel::class],
-    version = 2
+    version = 3
 )
 abstract class AudiosDatabase: RoomDatabase() {
     abstract fun audiosDao(): AudiosDao
@@ -23,7 +25,8 @@ abstract class AudiosDatabase: RoomDatabase() {
 
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(context.applicationContext,
-                AudiosDatabase::class.java, "audios.db").fallbackToDestructiveMigration()
+                AudiosDatabase::class.java, "audios.db")
+                .fallbackToDestructiveMigration()
                 .build()
     }
 }

@@ -23,6 +23,7 @@
         android:id="@+id/seekBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:progressBackgroundTint="@color/colorPrimary"
         app:layout_constraintTop_toTopOf="@id/songImg"
         app:layout_constraintStart_toEndOf="@id/tvStartTime"
         app:layout_constraintEnd_toStartOf="@id/tvEndTime"/>
