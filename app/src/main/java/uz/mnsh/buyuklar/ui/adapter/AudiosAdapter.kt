@@ -22,6 +22,7 @@ import uz.mnsh.buyuklar.data.db.model.AudioModel
 import uz.mnsh.buyuklar.data.model.SongModel
 import uz.mnsh.buyuklar.utils.FragmentAction
 
+//audiolar ro'yhatini recycleView ga chiqarib beruvchi adapter
 class AudiosAdapter(
     audiosModel: List<AudioModel>,
     private var fileList: ArrayList<SongModel>,

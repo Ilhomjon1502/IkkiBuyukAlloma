@@ -32,6 +32,7 @@ import java.io.IOException
 import java.io.InputStream
 import kotlin.coroutines.CoroutineContext
 
+//buyuklar haqida ma'lumot beruvchi fragment
 class InfoFragment : Fragment(R.layout.info_fragment), CoroutineScope, KodeinAware {
 
     companion object {

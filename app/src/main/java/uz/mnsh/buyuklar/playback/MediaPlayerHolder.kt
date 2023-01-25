@@ -27,6 +27,8 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
     private var mSeekBarPositionUpdateTask: Runnable? = null
     private var mSelectedSong: SongModel? = null
     private var mSongs: List<SongModel>? = null
+
+    //faqat 1 ta audio yangrashi
     private var sReplaySong = false
     @PlaybackInfoListener.State
     private var mState: Int = 0
@@ -35,6 +37,7 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
     private var mCurrentAudioFocusState = AUDIO_NO_FOCUS_NO_DUCK
     private var mPlayOnFocusGain: Boolean = false
 
+    //audio focusi o'zgarishni eshitish
     private val mOnAudioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
         when (focusChange) {
             AudioManager.AUDIOFOCUS_GAIN -> mCurrentAudioFocusState = AUDIO_FOCUSED
@@ -53,10 +56,13 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         }
     }
 
+    //constructor da audioManager obekti yaratilib olinmoqda
     init {
         mAudioManager = mContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     }
 
+    //MusicService ga notification uchun button click actionlar ni register qilish
+    //bluetooth uchun ham bo'lishi mumkin
     private fun registerActionsReceiver() {
         mNotificationActionsReceiver = NotificationReceiver()
         val intentFilter = IntentFilter()
@@ -72,6 +78,7 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         mMusicService!!.registerReceiver(mNotificationActionsReceiver, intentFilter)
     }
 
+    //MusicServicedan notificationReceiver ni unregister qilish
     private fun unregisterActionsReceiver() {
         if (mMusicService != null && mNotificationActionsReceiver != null) {
             try {
@@ -83,6 +90,7 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         }
     }
 
+    //ture - MusicService ga NotificationReceiver ni register aks holda unregister
     override fun registerNotificationActionsReceiver(isRegister: Boolean) {
 
         if (isRegister) {
@@ -92,40 +100,45 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         }
     }
 
+    //SongModel ni qaytarish
     override fun getCurrentSong(): SongModel? {
         return mSelectedSong
     }
 
 
+    //audioni tanlanganini o'rnatish song va audiolar ro'yhatini o'rnatish songs
     override fun setCurrentSong(song: SongModel, songs: List<SongModel>) {
         mSelectedSong = song
         mSongs = songs
     }
 
+    //media eshituvchisiga tugallanganini aytish
     override fun onCompletion(mediaPlayer: MediaPlayer) {
         if (mPlaybackInfoListener != null) {
             mPlaybackInfoListener!!.onStateChanged(PlaybackInfoListener.State.COMPLETED)
         }
 
-        if (sReplaySong) {
-            if (isMediaPlayer()) {
-                resetSong()
+        if (sReplaySong) { // agar boshqa audio yo'q bo'lsa
+            if (isMediaPlayer()) {//mediaPlayer null bo'lmasa (o'rnatilgan bo'lsa)
+                resetSong() //ijrodagi audioni qayta ijro et
             }
-            sReplaySong = false
-        } else {
-            skip(true)
+            sReplaySong = false //qayta ijroni false qil
+        } else { //aks holda
+            skip(true) //keyingi audioga o't
         }
     }
 
+    //activity onResume bo'lganda (seekbar progress o'zgarishini boshlash)
     override fun onResumeActivity() {
         startUpdatingCallbackWithPosition()
     }
 
-
+    //activity onPause bo'lganda (seekbar progress to'xtatish)
     override fun onPauseActivity() {
         stopUpdatingCallbackWithPosition()
     }
 
+    //audioni focusga olishga harakat
     private fun tryToGetAudioFocus() {
 
         val result = mAudioManager.requestAudioFocus(
@@ -139,16 +152,19 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         }
     }
 
+    //audio focus ni yo'qotish
     private fun giveUpAudioFocus() {
         if (mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             mCurrentAudioFocusState = AUDIO_NO_FOCUS_NO_DUCK
         }
     }
 
+    //PlaybackInfoListener media ma'lumotlarini eshituvchisini yaratish
     override fun setPlaybackInfoListener(playbackInfoListener: PlaybackInfoListener) {
         mPlaybackInfoListener = playbackInfoListener
     }
 
+    //PlaybackInfoListener media ma'lumotlari eshituvchisini holatini o'rnatish
     private fun setStatus(@PlaybackInfoListener.State state: Int) {
 
         mState = state
@@ -157,6 +173,7 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         }
     }
 
+    //mediaPlayer ni play qilish
     private fun resumeMediaPlayer() {
         if (!isPlaying()) {
             mMediaPlayer!!.start()
@@ -165,6 +182,7 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         }
     }
 
+    //mediaPlayer ni pause qilish
     private fun pauseMediaPlayer() {
         setStatus(PlaybackInfoListener.State.PAUSED)
         mMediaPlayer!!.pause()
@@ -172,22 +190,27 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         mMusicNotificationManager!!.notificationManager.notify(MusicNotificationManager.NOTIFICATION_ID, mMusicNotificationManager!!.createNotification())
     }
 
+    //audio ni boshidan ijro et
     private fun resetSong() {
         mMediaPlayer!!.seekTo(0)
         mMediaPlayer!!.start()
         setStatus(PlaybackInfoListener.State.PLAYING)
     }
 
+    //asosan seekbar o'zgarishini boshlash
     private fun startUpdatingCallbackWithPosition() {
         if (mExecutor == null) {
             mExecutor = Executors.newSingleThreadScheduledExecutor()
         }
+
+        //seekbar uchun oqim yangilash agar u null bo'lsa
         if (mSeekBarPositionUpdateTask == null) {
             mSeekBarPositionUpdateTask = Runnable {
                 updateProgressCallbackTask()
             }
         }
 
+        //sekbarni xususiyatlarini o'rnatish
         mExecutor!!.scheduleAtFixedRate(
             mSeekBarPositionUpdateTask,
             0,
@@ -196,6 +219,7 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         )
     }
 
+    //asosan seekbar o'zgarishini to'xtatish
     private fun stopUpdatingCallbackWithPosition() {
         if (mExecutor != null) {
             mExecutor!!.shutdownNow()
@@ -204,19 +228,21 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         }
     }
 
+    //asosan seekbar o'zgarishi yangilash
     private fun updateProgressCallbackTask() {
         try {
-            if (isMediaPlayer() && mMediaPlayer!!.isPlaying) {
-                val currentPosition = mMediaPlayer!!.currentPosition
-                if (mPlaybackInfoListener != null) {
-                    mPlaybackInfoListener?.onPositionChanged(currentPosition)
+            if (isMediaPlayer() && mMediaPlayer!!.isPlaying) {//mediaPlayer yaratilgan bo'lsa va u ijro qilayotgan bo'lsa
+                val currentPosition = mMediaPlayer!!.currentPosition //ijro positionni ol
+                if (mPlaybackInfoListener != null) {//media ma'lumotlari tinglovchisi null bo'lmasa
+                    mPlaybackInfoListener?.onPositionChanged(currentPosition) //position o'zgarish funksiyasini ishlat
                 }
             }
         }catch (e: Exception){}
     }
 
+    //keyingi audio yoki qayta tinglash
     override fun instantReset() {
-        if (isMediaPlayer()) {
+        if (isMediaPlayer()) {//mediaPlayer yaratilganmi null emasmi
             if (mMediaPlayer!!.currentPosition < 5000) {
                 skip(false)
             } else {
@@ -225,6 +251,7 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         }
     }
 
+    //mediaPlayer ni yaratish
     override fun initMediaPlayer() {
 
         try {
@@ -242,8 +269,8 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
                         .build())
                 mMusicNotificationManager = mMusicService!!.musicNotificationManager
             }
-            tryToGetAudioFocus()
-            mMediaPlayer!!.setDataSource(mSelectedSong?.songPath)
+            tryToGetAudioFocus()//qurilma mediasini focus olishga harakat
+            mMediaPlayer!!.setDataSource(mSelectedSong?.songPath)//mediaPlayer yo'lini o'rsatish
             mMediaPlayer!!.prepare()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -253,16 +280,18 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
     }
 
 
+    //mediaPlayer ni qaytarib berish
     override fun getMediaPlayer(): MediaPlayer? {
         return mMediaPlayer
     }
 
+    //media tayyorlash, seekbar va media eshituvchisini o'rnatish
     override fun onPrepared(mediaPlayer: MediaPlayer) {
         startUpdatingCallbackWithPosition()
         setStatus(PlaybackInfoListener.State.PLAYING)
     }
 
-
+    //media ni to'lqi to'xtatish, focus ni ham olib tashlash
     override fun release() {
         if (isMediaPlayer()) {
             mMediaPlayer!!.release()
@@ -272,10 +301,12 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         }
     }
 
+    //audio yangrayaptimi
     override fun isPlaying(): Boolean {
         return isMediaPlayer() && mMediaPlayer!!.isPlaying
     }
 
+    //play pause qilish
     override fun resumeOrPause() {
         if (isPlaying()) {
             pauseMediaPlayer()
@@ -284,37 +315,43 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
         }
     }
 
+    //PlaybackInfoListener ning
     @PlaybackInfoListener.State
     override fun getState(): Int {
         return mState
     }
 
+    //mediaPlayer o'rnatilmagan null bo'lsa false, o'rnatilgan bo'lsa true
     override fun isMediaPlayer(): Boolean {
         return mMediaPlayer != null
     }
 
+    //audio qayta ijro etilishi
     override fun reset() {
         sReplaySong = !sReplaySong
     }
 
+    //audio qayta ijro etilishi true bo'lsa qayta ijro etiladi
     override fun isReset(): Boolean {
         return sReplaySong
     }
 
+    //keyingiga o'tkazish
     override fun skip(isNext: Boolean) {
         getSkipSong(isNext)
     }
 
+    //audioni o'tkazish yoki qaytarish yoki boshiga o'tkazish
     private fun getSkipSong(isNext: Boolean) {
         val currentIndex = mSongs!!.indexOf(mSelectedSong)
 
         val index: Int
 
-        try {
+        try {//keyingiga o'tkazish yoki qaytarish
             index = if (isNext) currentIndex + 1 else currentIndex - 1
             mSelectedSong = mSongs!![index]
         } catch (e: IndexOutOfBoundsException) {
-            try {
+            try {//index topilmasa boshiga o'tkazish
                 mSelectedSong =
                     if (currentIndex != 0)
                         mSongs!![0]
@@ -322,30 +359,33 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
                         mSongs!![mSongs!!.size - 1]
 
             }catch (e:Exception){
-                Toast.makeText(mContext, "Xatolik \n ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(mContext, "Media ijrosida (list bo'shlgigida) Xatolik \n ${e.message}", Toast.LENGTH_SHORT).show()
             }
             e.printStackTrace()
         }
         initMediaPlayer()
     }
 
+    //audioni ozgina o'tkazish
     override fun seekTo(position: Int) {
-        if (isMediaPlayer()) {
+        if (isMediaPlayer()) {//mediaPlayer yaratilgan bo'lsa
             mMediaPlayer!!.seekTo(position)
         }
     }
 
+    //mediaPlayer ni current positionini qaytarish (ijrodagi)
     override fun getPlayerPosition(): Int {
         return mMediaPlayer!!.currentPosition
     }
 
-
+    //mediaPlayerni sozlash
     private fun configurePlayerState() {
 
         if (mCurrentAudioFocusState == AUDIO_NO_FOCUS_NO_DUCK) {
-            pauseMediaPlayer()
+            pauseMediaPlayer()//agar media focus i olingan bo'lsa pause qilib qo'y
         } else {
 
+            //media ovozini pasaytirib yoki ko'tarib davom etish
             if (mCurrentAudioFocusState == AUDIO_NO_FOCUS_CAN_DUCK) {
                 mMediaPlayer!!.setVolume(VOLUME_DUCK, VOLUME_DUCK)
             } else {
@@ -353,12 +393,13 @@ class MediaPlayerHolder(private val mMusicService: MusicService?) :
             }
 
             if (mPlayOnFocusGain) {
-                resumeMediaPlayer()
+                resumeMediaPlayer()//mediaPlayerni play qilib davom etish
                 mPlayOnFocusGain = false
             }
         }
     }
 
+    //notification actionlarini boshqarish
     private inner class NotificationReceiver : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {

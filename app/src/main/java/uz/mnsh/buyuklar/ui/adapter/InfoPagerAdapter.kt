@@ -11,7 +11,7 @@ private val TAB_TITLES = arrayOf(
         R.string.tab_text_1,
         R.string.tab_text_2
 )
-
+//buyuklar haqida ma'lumot adapter
 class InfoPagerAdapter(private val context: Context, fm: FragmentManager)
     : FragmentPagerAdapter(fm) {
 

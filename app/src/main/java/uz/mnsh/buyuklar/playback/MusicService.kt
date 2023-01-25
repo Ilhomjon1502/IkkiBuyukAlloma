@@ -8,9 +8,11 @@ import android.os.IBinder
 class MusicService : Service() {
     private val mIBinder = LocalBinder()
 
+    //bizning barcha funksiyalar yozilgan class
     var mediaPlayerHolder: MediaPlayerHolder? = null
         private set
 
+    //notification ni boshqaruvi
     var musicNotificationManager: MusicNotificationManager? = null
         private set
 
@@ -20,6 +22,7 @@ class MusicService : Service() {
         return Service.START_NOT_STICKY
     }
 
+    //server onDestroyida notification va mediaPlayer ni yo'qotib yubormoqda
     override fun onDestroy() {
         mediaPlayerHolder?.registerNotificationActionsReceiver(false)
         musicNotificationManager = null
@@ -27,6 +30,7 @@ class MusicService : Service() {
         super.onDestroy()
     }
 
+    //serverning onBind ida MediaPlayerHolder classidan obekt olinmoqda
     override fun onBind(intent: Intent): IBinder? {
         if (mediaPlayerHolder == null) {
             mediaPlayerHolder = MediaPlayerHolder(this)
