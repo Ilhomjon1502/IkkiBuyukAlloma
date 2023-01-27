@@ -11,11 +11,12 @@ class PageViewModel(
     private val audiosRepository: AudiosRepository
 ) : ViewModel() {
 
-    private val _index = MutableLiveData<Int>()
+    private val _index = MutableLiveData<Int>()//1-alloma yoki 2-alloma
     val text: LiveData<Int> = Transformations.map(_index) {
         it
     }
 
+    //index 1 bo'lsa 1-allloma topicId 10, 2 bo'lsa 2-alloma topicId 11
     fun setIndex(index: Int) {
         _index.value = index
     }

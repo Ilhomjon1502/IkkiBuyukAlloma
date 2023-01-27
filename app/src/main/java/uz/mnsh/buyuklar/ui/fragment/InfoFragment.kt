@@ -13,6 +13,7 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.lifecycle.Observer
 import com.downloader.Error
@@ -88,22 +89,23 @@ class InfoFragment : Fragment(R.layout.info_fragment), CoroutineScope, KodeinAwa
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(InfoViewModel::class.java).apply {
-            setIndex(arguments?.getInt(ARG_SECTION_NUMBER) ?: 1)
-        }
+        viewModel =
+            ViewModelProviders.of(this, viewModelFactory).get(InfoViewModel::class.java).apply {
+                setIndex(arguments?.getInt(ARG_SECTION_NUMBER) ?: 1)
+            }
         viewModel.text.observe(viewLifecycleOwner, Observer {
             loadData(it)
         })
     }
 
-    private fun loadData(index: Int) = launch{
-        if (index == 1){
+    private fun loadData(index: Int) = launch {
+        if (index == 1) {
             viewModel.getFirst("10", 1).value.await().observe(viewLifecycleOwner, Observer {
                 if (it == null) return@Observer
                 bindUI(it, index)
             })
-        }else{
-            viewModel.getFirst("11", 1).value.await().observe(viewLifecycleOwner, Observer {
+        } else {
+            viewModel.getFirst("11", 10).value.await().observe(viewLifecycleOwner, Observer {
                 if (it == null) return@Observer
                 bindUI(it, index)
             })
@@ -111,12 +113,12 @@ class InfoFragment : Fragment(R.layout.info_fragment), CoroutineScope, KodeinAwa
 
     }
 
-    private fun bindUI(model: AudioModel, index: Int){
+    private fun bindUI(model: AudioModel, index: Int) {
         try {
-            val inputStream: InputStream? = if (index == 1){
+            val inputStream: InputStream? = if (index == 1) {
                 imgInfo.setImageResource(R.drawable.info_1)
                 context?.assets?.open("info_text_one.txt")
-            }else{
+            } else {
                 imgInfo.setImageResource(R.drawable.info_2)
                 context?.assets?.open("info_text_two.txt")
             }
@@ -124,7 +126,7 @@ class InfoFragment : Fragment(R.layout.info_fragment), CoroutineScope, KodeinAwa
             inputStream.read(buffer)
             tvInfo.text = String(buffer)
             textInfo.text = model.name
-        }catch (e: IOException){
+        } catch (e: IOException) {
 
         }
 
@@ -134,36 +136,36 @@ class InfoFragment : Fragment(R.layout.info_fragment), CoroutineScope, KodeinAwa
             }
         }
 
-        if (listAudios.contains(model.getFileName())){
+        if (listAudios.contains(model.getFileName())) {
             btnPlay.setImageResource(R.drawable.play)
             bindCard(model.getFileName(), model.topic.toString())
-        }else{
+        } else {
             btnPlay.setImageResource(R.drawable.download)
         }
 
         btnPlay.setOnClickListener {
-            if (listAudios.contains(model.getFileName())){
-                if (isStop){
+            if (listAudios.contains(model.getFileName())) {
+                if (isStop) {
                     btnPlay.setImageResource(R.drawable.play)
                     mediaPlayer?.pause()
                     isStop = false
-                }else{
+                } else {
                     btnPlay.setImageResource(R.drawable.stop)
                     isStop = true
                     mediaPlayer?.start()
                     updateSong()
                 }
-            }else{
-                if (PRDownloader.getStatus(downloadID) == Status.RUNNING){
+            } else {
+                if (PRDownloader.getStatus(downloadID) == Status.RUNNING) {
                     PRDownloader.cancel(downloadID)
                     progressBar.visibility = View.GONE
                     btnPlay.setImageResource(R.drawable.download)
-                }else {
+                } else {
                     progressBar.visibility = View.VISIBLE
                     btnPlay.setImageResource(R.drawable.cancel)
                     downloadID = PRDownloader.download(
                         BASE_URL + model.location,
-                        App.DIR_PATH + model.rn + "/",
+                        App.DIR_PATH + model.topic + "/",
                         model.getFileName()
                     ).build()
                         .setOnProgressListener {
@@ -184,33 +186,60 @@ class InfoFragment : Fragment(R.layout.info_fragment), CoroutineScope, KodeinAwa
                 }
             }
         }
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                if (mediaPlayer!=null && p2){
+                    mediaPlayer?.seekTo(p1)
+                }
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+
+            }
+        })
     }
 
-    private fun bindCard(name: String, topID: String){
-        mediaPlayer = MediaPlayer.create(context, Uri.fromFile(File(App.DIR_PATH + "$topID/$name")))
+    private fun bindCard(name: String, topID: String) {
+//        try {
+        mediaPlayer =
+            MediaPlayer.create(context, Uri.fromFile(File(App.DIR_PATH + "$topID/$name")))
         startTime = mediaPlayer!!.currentPosition / 1000
         endTime = mediaPlayer!!.duration / 1000
         tvStartTime.text = getFormattedTime(startTime)
         tvEndTime.text = getFormattedTime(endTime)
-        seekBar.progress = mediaPlayer!!.currentPosition / 100
+        seekBar.max = mediaPlayer!!.duration
+        seekBar.progress = mediaPlayer!!.currentPosition
+//        }catch (e:Exception){
+//            Toast.makeText(
+//                context,
+//                "Iltimos qayta urinib ko'ring. \nHozirda xatolarni bartaraf etish ishlari ketmoqda",
+//                Toast.LENGTH_SHORT
+//            ).show()
+//        }
     }
 
-    private fun updateSong(){
+    private fun updateSong() {
         startTime = mediaPlayer!!.currentPosition / 1000
         tvStartTime.text = getFormattedTime(startTime)
-        seekBar.progress = (mediaPlayer!!.currentPosition) / endTime / 10
-        if ((mediaPlayer!!.currentPosition / 1000) == endTime){
+//        seekBar.progress = (mediaPlayer!!.currentPosition) / endTime / 10
+        seekBar.progress = mediaPlayer!!.currentPosition
+        if ((mediaPlayer!!.currentPosition / 1000) == endTime) {
             btnPlay.setImageResource(R.drawable.play)
-        }else{
+        } else {
             Handler().postDelayed({ updateSong() }, 1000)
         }
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
-        if(!isVisibleToUser){
-            if (mediaPlayer != null){
-                if (mediaPlayer!!.isPlaying){
+        if (!isVisibleToUser) {
+            if (mediaPlayer != null) {
+                if (mediaPlayer!!.isPlaying) {
                     btnPlay.setImageResource(R.drawable.play)
                     mediaPlayer?.pause()
                     isStop = false

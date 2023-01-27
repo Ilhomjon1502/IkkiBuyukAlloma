@@ -61,12 +61,12 @@ class PlaceholderFragment : Fragment(R.layout.fragment_main), CoroutineScope, Ko
     }
 
     private fun loadData(index: Int) = launch {
-        if (index == 1){
+        if (index == 1){//1-alloma
             pageViewModel.getAudios(10).value.await().observe(viewLifecycleOwner, Observer {
                 if (it == null) return@Observer
                 bindUI(it)
             })
-        }else{
+        }else{//2-alloma
             pageViewModel.getAudios(11).value.await().observe(viewLifecycleOwner, Observer {
                 if (it == null) return@Observer
                 bindUI(it)
@@ -84,7 +84,7 @@ class PlaceholderFragment : Fragment(R.layout.fragment_main), CoroutineScope, Ko
                         songPath = file.path,
                         topicID = audioModel[0].topic
                     )
-                    listAudioFile.add(sm)
+                    listAudioFile.add(sm)//media uchun listga file ma'lumotlarini o'qib olmoqda, fayllar download ichida 10 yoki 11 papakasi ichida name bilan saqlanadi
                 }
             }
             mAdapter = AudiosAdapter(audioModel, listAudioFile, this)
@@ -99,12 +99,20 @@ class PlaceholderFragment : Fragment(R.layout.fragment_main), CoroutineScope, Ko
                     if (model.name == mPlayerAdapter!!.getCurrentSong()?.name){
                         if (it){
                             mAdapter?.isPlay = i
-                        }else mAdapter?.isPlay = -1
-                        play = false
+                        }else{
+                            mAdapter?.isPlay = -1
+                        }
+                        mAdapter?.notifyItemChanged(i)
+//                        play = false
                     }
                 }
-                if (play) mAdapter?.isPlay = -1
-                mAdapter?.notifyDataSetChanged()
+//                if (play) mAdapter?.isPlay = -1
+//                mAdapter?.notifyDataSetChanged()
+                /*
+                pause yoki play button bosilganda
+                isSongPlay liveData da audio play yoki pause ligi keladi
+                agar ijrodagi media audioModeldagi
+                 */
             })
         }
     }

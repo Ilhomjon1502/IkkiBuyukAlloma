@@ -57,16 +57,31 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     override val kodein by kodein()
     private val unitProvider: UnitProvider by instance()
     private val audiosRepository: AudiosRepository by instance()
+
+    //mashina rejimi
     private lateinit var audioTitle: TextView
     private lateinit var playButton: ImageView
     private lateinit var replayButton: ImageView
     private lateinit var forwardButton: ImageView
+
+    //bizining MusicService imiz
     private var mMusicService: MusicService? = null
+
+    //seekbar user tomonidan o'zgartirildimi
     private var mUserIsSeeking = false
+
+    //media ma'lumotlarini eshitib turuvchi
     private var mPlaybackListener: PlaybackListener? = null
+
     private var mMusicNotificationManager: MusicNotificationManager? = null
+
+    //media file (download dagi) lar ro'yhati
     private var listAudiosFile: ArrayList<SongModel> = ArrayList()
+
+    //media MediaPlayer ijrosi uchun
     private var songModel: SongModel? = null
+
+    //MusicService bind mi
     private var mIsBound: Boolean? = null
 
     companion object {
@@ -75,11 +90,15 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         var isSongPlay: MutableLiveData<Boolean> = MutableLiveData()
     }
 
+    //MusicService bilan bog'lanish, listener
     private val mConnection = object : ServiceConnection {
+
+        //service uzilganda
         override fun onServiceDisconnected(p0: ComponentName?) {
             mMusicService = null
         }
 
+        //service bog'langanda
         override fun onServiceConnected(componentName: ComponentName?, iBinder: IBinder?) {
             mMusicService = (iBinder as MusicService.LocalBinder).instance
             mPlayerAdapter = mMusicService!!.mediaPlayerHolder
@@ -125,14 +144,14 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
         requestPermissions()
         try {
-            bindUI()
-            initializeSeekBar()
+            bindUI()//button clicklar va media davomiyligi
+            initializeSeekBar()//seekbar ni changeLister i
         } catch (e: Exception) {
             Toast.makeText(this, "File topilmadi \n ${e.message}", Toast.LENGTH_SHORT).show()
         }
         GlobalScope.launch(Dispatchers.IO) {
-            if (unitProvider.isOnline()) {
-                audiosRepository.fetchingAudios()
+            if (unitProvider.isOnline()) {//agar qurilmada internet bo'lsa
+                audiosRepository.fetchingAudios()// audiolarni API dan olib kel
             }
         }
     }
@@ -186,8 +205,11 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         }
     }
 
+    //keshdan o'qish, button clicklar, media davomiyligi
     private fun bindUI() {
         listAudiosFile.clear()
+
+        //keshdan listAudioFile ga songModel larni o'qib olish
         if (unitProvider.getSavedAudio().length > 5) {
             songModel = Gson().fromJson(unitProvider.getSavedAudio(), SongModel::class.java)
             File(App.DIR_PATH + "${songModel!!.topicID}/").walkTopDown().forEach { file ->
@@ -200,16 +222,18 @@ class MainActivity : AppCompatActivity(), KodeinAware {
                     listAudiosFile.add(sm)
                 }
             }
-            tvSongName.text = songModel!!.name
-            tvEndTime.text = getFormattedTime(Utils.getDuration(songModel!!.songPath) / 1000)
+            tvSongName.text = songModel!!.name //audio nomini yozish
+            tvEndTime.text = getFormattedTime(Utils.getDuration(songModel!!.songPath) / 1000)// audio davomiyligini yozish
         }
 
+        //keyingiga o'tkazish
         imgNext.setOnClickListener {
             if (checkIsPlayer()) {
                 mPlayerAdapter!!.skip(true)
             }
         }
 
+        //play pause button click
         imgPlay.setOnClickListener {
             if (isSavedSong && songModel != null) {
                 mPlayerAdapter!!.initMediaPlayer()
@@ -220,13 +244,14 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             }
         }
 
+        //oldingiga qaytarish
         imgPrevious.setOnClickListener {
             if (checkIsPlayer()) {
                 mPlayerAdapter!!.instantReset()
             }
         }
 
-
+        //30 sekund o'tkazish
         forwardButton.setOnClickListener {
             if (mPlayerAdapter != null) {
                 if (mPlayerAdapter!!.getMediaPlayer()!!.currentPosition.plus(30000) < mPlayerAdapter!!.getMediaPlayer()!!.duration) {
@@ -238,11 +263,12 @@ class MainActivity : AppCompatActivity(), KodeinAware {
                 } else {
                     mPlayerAdapter!!.skip(true)
                 }
-            }else{
+            } else {
                 Toast.makeText(this, "242 mPlayerAdapter null", Toast.LENGTH_SHORT).show()
             }
         }
 
+        //30 sekund qaytarish
         replayButton.setOnClickListener {
             if (mPlayerAdapter!!.getMediaPlayer()!!.currentPosition.minus(30000) > 0) {
                 mPlayerAdapter!!.seekTo(
@@ -255,6 +281,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             }
         }
 
+        //play pause mashina rejimi
         playButton.setOnClickListener {
             if (isSavedSong && songModel != null) {
                 mPlayerAdapter!!.initMediaPlayer()
@@ -276,6 +303,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         }
     }
 
+    //seekbar ni o'zgarganida mediani o'zgartirish
     private fun initializeSeekBar() {
         seekBar!!.setOnSeekBarChangeListener(
             object : SeekBar.OnSeekBarChangeListener {
@@ -296,6 +324,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             })
     }
 
+    //MusicService ni unBind qilish
     private fun doUnbindService() {
         if (mIsBound!!) {
             unbindService(mConnection)
@@ -303,6 +332,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         }
     }
 
+    //MusicService ni bind qilish
     private fun doBindService() {
         bindService(
             Intent(
@@ -316,8 +346,10 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         startService(startNotStickyIntent)
     }
 
+    //notification , seekbar o'zgarishi
     private fun updatePlayingInfo(restore: Boolean, startPlay: Boolean) {
 
+        //notification
         if (startPlay) {
             mPlayerAdapter!!.getMediaPlayer()?.start()
             Handler().postDelayed({
@@ -353,13 +385,17 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         }
     }
 
+    //play pause icon (mashina rejimi ham) va Media satusini o'zgartirish
     private fun updatePlayingStatus() {
+
+        //agar State.PAUSE bo'lmasa ic_stop ni drawable o'zgaruvchisiga tengla
         val drawable = if (mPlayerAdapter!!.getState() != PlaybackInfoListener.State.PAUSED)
             R.drawable.ic_stop
         else
-            R.drawable.ic_play
+            R.drawable.ic_play //pause bo'lgan bo'lsa bunga
         imgPlay!!.post { imgPlay!!.setImageResource(drawable) }
 
+            //mashina rejimi
         if (mPlayerAdapter!!.getState() != PlaybackInfoListener.State.PAUSED) {
             playButton.setImageResource(R.drawable.ic_pause_circled)
         } else {
@@ -374,7 +410,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
     }
 
     private fun resumeOrPause() {
@@ -440,6 +475,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         return String.format("%d:%02d", minutes, seconds % 60)
     }
 
+    //serverni unBind qiladi
     override fun onPause() {
         super.onPause()
         doUnbindService()
@@ -447,21 +483,24 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             if (mPlayerAdapter!!.isMediaPlayer()) {
                 mPlayerAdapter!!.onPauseActivity()
             }
-        }else{
-            Toast.makeText(this, "450-qator mPlayerAdapter null", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "onPause 486-qator mPlayerAdapter null", Toast.LENGTH_SHORT).show()
         }
     }
 
+    //serverni bind qiladi
     override fun onResume() {
         super.onResume()
         doBindService()
     }
 
+    //SongModel ni keshga saqlab qo'yadi
     override fun onStop() {
         super.onStop()
         unitProvider.setSavedAudio(Gson().toJson(mPlayerAdapter!!.getCurrentSong()))
     }
 
+    //media ma'lumotlarini o'zgarishini eshitib ish bajaradi
     internal inner class PlaybackListener : PlaybackInfoListener() {
 
         override fun onPositionChanged(position: Int) {
@@ -470,21 +509,22 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         }
 
         override fun onStateChanged(@State state: Int) {
-            updatePlayingStatus()
+            updatePlayingStatus()//play pause icon va Media Status o'zgartiradi
             if (mPlayerAdapter!!.getState() != State.PAUSED
                 && mPlayerAdapter!!.getState() != State.PAUSED
             ) {
-                isSongPlay.postValue(true)
+                isSongPlay.postValue(true)// media ijroda eknaligini liveData ga yozish
                 updatePlayingInfo(restore = false, startPlay = true)
-            } else isSongPlay.postValue(false)
+            } else isSongPlay.postValue(false)//media pause daligini liveData ga yozish
         }
     }
 
+    //chiqish tugamsi bosilganda
     override fun onBackPressed() {
-        if (driving_mode_container.visibility == View.VISIBLE) {
-            driving_mode_container.visibility = View.GONE
+        if (driving_mode_container.visibility == View.VISIBLE) {//mashina rejimida bo'lsa
+            driving_mode_container.visibility = View.GONE//uni yop
         } else {
-            super.onBackPressed()
+            super.onBackPressed()//dasturdan chiqib ket
         }
     }
 }

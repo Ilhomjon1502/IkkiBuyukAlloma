@@ -82,6 +82,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/text_info"
+                    android:progressBackgroundTint="@color/colorPrimary"
                     android:layout_marginStart="10dp"
                     android:layout_toEndOf="@id/tv_start_time"
                     android:layout_toStartOf="@id/tv_end_time"/>

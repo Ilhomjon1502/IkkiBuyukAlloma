@@ -19,6 +19,7 @@ class InfoActivity : AppCompatActivity() {
                 supportFragmentManager
             )
 
+        ///ikki ulamo uchun ma'lumot beruvchi fragment joylash
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = infoPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
