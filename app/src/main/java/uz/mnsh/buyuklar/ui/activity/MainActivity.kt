@@ -3,6 +3,7 @@ package uz.mnsh.buyuklar.ui.activity
 import android.Manifest
 import android.content.ComponentName
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.ServiceConnection
 import android.media.MediaPlayer
@@ -143,10 +144,19 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         forwardButton = findViewById(R.id.forward)
 
         requestPermissions()
+        initializeSeekBar()//seekbar ni changeLister i
         try {
             bindUI()//button clicklar va media davomiyligi
-            initializeSeekBar()//seekbar ni changeLister i
         } catch (e: Exception) {
+            val dialog = AlertDialog.Builder(this)
+            dialog.setTitle("Ogohlantirish")
+            dialog.setMessage("Qurilmangiz (Telefoningiz) xotirasidan download papkasi ichidagi Ikki buyuk alloma papkasidagi ma'lumotlarni o'chirib tashlabsiz. Shuning uchun ilovaga qayta kirib audiolarni qayta yuklab olib keyin tinglashingiz mumkin")
+            dialog.setPositiveButton("Xo'p", object :DialogInterface.OnClickListener{
+                override fun onClick(p0: DialogInterface?, p1: Int) {
+//                    finish()
+                }
+            })
+            dialog.show()
             Toast.makeText(this, "File topilmadi \n ${e.message}", Toast.LENGTH_SHORT).show()
         }
         GlobalScope.launch(Dispatchers.IO) {
@@ -205,6 +215,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         }
     }
 
+    var hasKesh = true
     //keshdan o'qish, button clicklar, media davomiyligi
     private fun bindUI() {
         listAudiosFile.clear()
@@ -292,6 +303,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             }
         }
 
+        hasKesh = false
     }
 
     private fun restorePlayerStatus() {
@@ -387,7 +399,10 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
     //play pause icon (mashina rejimi ham) va Media satusini o'zgartirish
     private fun updatePlayingStatus() {
-
+        unitProvider.setSavedAudio(Gson().toJson(mPlayerAdapter!!.getCurrentSong()))
+        if (hasKesh){
+            bindUI()
+        }
         //agar State.PAUSE bo'lmasa ic_stop ni drawable o'zgaruvchisiga tengla
         val drawable = if (mPlayerAdapter!!.getState() != PlaybackInfoListener.State.PAUSED)
             R.drawable.ic_stop
@@ -492,7 +507,9 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     override fun onResume() {
         super.onResume()
         doBindService()
-        bindUI()
+        try {
+            bindUI()
+        }catch (e:Exception){}
     }
 
     //SongModel ni keshga saqlab qo'yadi
