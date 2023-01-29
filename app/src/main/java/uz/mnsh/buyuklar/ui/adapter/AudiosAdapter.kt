@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +25,7 @@ import uz.mnsh.buyuklar.utils.FragmentAction
 
 //audiolar ro'yhatini recycleView ga chiqarib beruvchi adapter
 class AudiosAdapter(
+    val context: Context?,
     audiosModel: List<AudioModel>,
     private var fileList: ArrayList<SongModel>,
     private val fragmentAction: FragmentAction
@@ -33,8 +35,11 @@ class AudiosAdapter(
     private val listModel: ArrayList<AudioModel> = ArrayList(audiosModel)
     var isPlay: Int = -1
     private var isStart: Boolean = true
+
+    //download bo'layotgan payt
     private var idList: HashMap<Int, Int> = HashMap()
 
+    //init view variable
     class AudiosViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTitle: TextView = view.findViewById(R.id.title)
         val tvDuration: TextView = view.findViewById(R.id.duration)
@@ -59,6 +64,7 @@ class AudiosAdapter(
         return listModel.size
     }
 
+    //view action and ui changed
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: AudiosViewHolder, position: Int) {
         holder.tvTitle.text = listModel[position].name
@@ -68,6 +74,13 @@ class AudiosAdapter(
         holder.download.setImageResource(R.drawable.download)
         holder.download.visibility = View.VISIBLE
         holder.progressBar.visibility = View.GONE
+
+        if (downloadingIndexSet.containsKey(position)){
+            holder.progressBar.visibility = View.VISIBLE
+            holder.download.setImageResource(R.drawable.cancel)
+            holder.progressBar.progress = downloadingIndexSet[position]?.progress!!
+        }
+
         fileList.forEach {
             if (it.name == listModel[position].name) {
                 holder.download.setImageResource(R.drawable.play)
@@ -108,11 +121,16 @@ class AudiosAdapter(
         }
     }
 
+    //file ni yuklab olish
+    val downloadingIndexSet = HashMap<Int, MyDownloadFile>()
     private fun startDownload(index: Int, holder: AudiosViewHolder) {
         if (idList[index] != null && PRDownloader.getStatus(idList[index]!!) == Status.RUNNING) {
             PRDownloader.cancel(idList[index]!!)
+            downloadingIndexSet.remove(index)
             notifyItemChanged(index)
         } else {
+            downloadingIndexSet[index] = MyDownloadFile(index)
+
             holder.progressBar.visibility = View.VISIBLE
             holder.download.setImageResource(R.drawable.cancel)
             idList[index] = PRDownloader.download(
@@ -121,7 +139,11 @@ class AudiosAdapter(
                 listModel[index].getFileName()
             ).build()
                 .setOnProgressListener {
-                    holder.progressBar.progress = (it.currentBytes * 100 / it.totalBytes).toInt()
+                    val progress = (it.currentBytes * 100 / it.totalBytes).toInt()
+                    downloadingIndexSet[index]?.progress = progress
+                    if (progress%5 == 0){
+                        notifyItemChanged(index)
+                    }
                 }
                 .start(object : OnDownloadListener {
                     override fun onDownloadComplete() {
@@ -129,15 +151,18 @@ class AudiosAdapter(
                             SongModel(
                                 name = listModel[index].name,
                                 songPath = "${App.DIR_PATH}${listModel[index].topic}/${listModel[index].getFileName()}",
-                                topicID = listModel[index].rn.toInt()
+                                topicID = listModel[index].topic
                             )
                         )
                         Log.d("TAG", "onDownloadComplete: ${App.DIR_PATH}${listModel[index].rn}/${listModel[index].getFileName()}")
                         notifyItemChanged(index)
                         idList.remove(index)
+                        downloadingIndexSet.remove(index)
                     }
 
                     override fun onError(error: Error?) {
+                        downloadingIndexSet.remove(index)
+                        Toast.makeText(context, "Tarmoqqa qayta ulaning. \nFaylni yuklab bo'lmadi", Toast.LENGTH_SHORT).show()
                         Log.d("BAG", error?.responseCode.toString())
                         notifyItemChanged(index)
                     }
@@ -151,3 +176,5 @@ class AudiosAdapter(
 //        return String.format("%d:%02d", minutes, seconds % 60)
 //    }
 }
+
+data class MyDownloadFile(val position:Int, var progress:Int = 0)

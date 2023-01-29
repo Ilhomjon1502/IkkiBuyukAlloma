@@ -1,6 +1,7 @@
 package uz.mnsh.buyuklar.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -28,7 +29,7 @@ import kotlin.coroutines.CoroutineContext
 
 //recycleViewni o'z ichiga olgan audiolar ro'yhatini ko'rsatadigan viewPager itemi fragmentidir
 class PlaceholderFragment : Fragment(R.layout.fragment_main), CoroutineScope, KodeinAware, FragmentAction {
-
+    private val TAG = "PlaceholderFragment"
     override val kodein by closestKodein()
     private val viewModelFactory: PageViewModelFactory by instance()
     private lateinit var pageViewModel: PageViewModel
@@ -87,7 +88,7 @@ class PlaceholderFragment : Fragment(R.layout.fragment_main), CoroutineScope, Ko
                     listAudioFile.add(sm)//media uchun listga file ma'lumotlarini o'qib olmoqda, fayllar download ichida 10 yoki 11 papakasi ichida name bilan saqlanadi
                 }
             }
-            mAdapter = AudiosAdapter(audioModel, listAudioFile, this)
+            mAdapter = AudiosAdapter(context, audioModel, listAudioFile, this)
             recyclerView.adapter = mAdapter
             recyclerView.visibility = View.VISIBLE
             spinKitView?.visibility = View.GONE
@@ -102,12 +103,15 @@ class PlaceholderFragment : Fragment(R.layout.fragment_main), CoroutineScope, Ko
                         }else{
                             mAdapter?.isPlay = -1
                         }
-                        mAdapter?.notifyItemChanged(i)
-//                        play = false
+                        play = false
+//                        mAdapter?.notifyItemChanged(i)
                     }
                 }
-//                if (play) mAdapter?.isPlay = -1
-//                mAdapter?.notifyDataSetChanged()
+                Log.d(TAG, "bindUI: $play")
+                if (play){
+                    mAdapter?.isPlay = -1
+                }
+                mAdapter?.notifyDataSetChanged()
                 /*
                 pause yoki play button bosilganda
                 isSongPlay liveData da audio play yoki pause ligi keladi

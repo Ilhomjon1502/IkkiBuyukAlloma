@@ -492,6 +492,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     override fun onResume() {
         super.onResume()
         doBindService()
+        bindUI()
     }
 
     //SongModel ni keshga saqlab qo'yadi
